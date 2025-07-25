@@ -23,6 +23,7 @@ netxml ={
         </config>
 """
 }#这是Huawei5700设置日志主机的xml
+#这里的netconf xml是一个测试,在真机设备上可以运行,作用是创建vlan100
 
 user_info = {
         'ssh':{
