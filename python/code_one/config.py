@@ -6,7 +6,7 @@ comist = {
         'memory':{'command':'dis memory ','re':'M\w+\s\w+\s\w+:\s+(\d+%)'},
         'fan':{'command':'display fan ','re':'Normal'}}
 
-
+#这里的正则表达式可能需要进行一些区分,真机和模拟器的正则表达式有一定的差别
 netxml ={
 "vlan":
 """
