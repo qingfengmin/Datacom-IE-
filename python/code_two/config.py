@@ -23,4 +23,4 @@ netxml ={
         </config>
 """
 }#这是Huawei5700设置日志主机的xml
-
+# 注意如果你使用的是RPC方式,不用复制到config标签
