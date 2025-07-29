@@ -54,19 +54,19 @@ queue af ba 307200
 drop hcie
 
 
-int g 4/0/0.10
+int g 0/0/10.10
 ip binding vpn-instance OA_IN
 ip a 10.20.3.2 30
 dot1q termination vid 10
  arp broadcast enable
 
-int g 4/0/0.20
+int g 0/0/10.20
 ip binding vpn-instance OA_OUT
 ip a 10.20.3.6 30
 dot1q termination vid 20
  arp broadcast enable
 
-int g 4/0/0.30
+int g 0/0/10.30
 ip binding vpn-instance R&D
 ip a 10.20.3.10 30
 dot1q termination vid 30
