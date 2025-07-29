@@ -77,6 +77,23 @@ net 10.1.25.254 0.0.0.0
 net 10.1.0.6 0.0.0.0
 net 10.1.200.30 0.0.0.0
 
+####
+准入认证配置
+dot1x-access-profile name Employee
+mac-access-profile name Employee
+
+
+radius-server template Employee
+radius-server shared-key cipher Huawei@123
+radius-server authentication 10.1.60.2 1812 weight 80
+radius-server accounting 10.1.60.2 1813 weight 80
+q
+radius-server authorization 10.1.60.2 share-key cipher Huawei@123
+#创建radius
+
+
+
+####
 
 
 interface eth-trunk 2
