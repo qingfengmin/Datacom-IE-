@@ -1,8 +1,6 @@
 
 bfd
 
-mpls lsr-id 1.0.0.1
-
 bfd 
 mpls-passive
 #设备自动创建mpls bfd会话
@@ -35,6 +33,8 @@ domain-authentication-mode md5 cipher Huawei@123
 #使能加密功能
 bfd all-interfaces enable
 bfd all-interfaces min-tx-interval 10 min-rx-interval 10
+ldp en
+y
 
 int loo 0
 isis enable 1
@@ -46,19 +46,27 @@ isis enable 1
 isis circuit-type p2p
 isis ppp-negotiation 2-way
 isis authentication-mode md5 cipher Huawei@123
+mpls 
+mp  ld
+mp mt 1382
 
 int g 0/0/2
 isis enable 1
 isis circuit-type p2p
 isis ppp-negotiation 2-way
 isis authentication-mode md5 cipher Huawei@123
-
+mpls 
+mp  ld
+mp mt 1382
 int g 0/0/3
 isis enable 1
 isis circuit-type p2p
 isis ppp-negotiation 2-way
 isis authentication-mode md5 cipher Huawei@123
 isis cost 4
+mpls 
+mp  ld
+mp mt 1382
 #在六台设备上修改ISIS的开销可以实现最短路径优先转发
 
 bfd frr bind peer-ip 5.0.0.5
