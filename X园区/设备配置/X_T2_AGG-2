@@ -1,7 +1,7 @@
 备设备部署
 stack slot 0 renumber 1
 
-interface stack-port 0/1 #在使能堆叠接口后 直接shutdown相关的接口 
+interface stack-port 0/1 
 port interface xg 0/0/2 enable 
 
 interface stack-port 0/2
@@ -12,7 +12,7 @@ port interface xg 0/0/1 enable
 stack slot 0 renumber 0
 stack slot 0 priority 150
 
-interface stack-port 0/1 #在使能堆叠接口后 直接shutdown相关的接口 
+interface stack-port 0/1 
 port interface xg 0/0/1 enable 
 
 interface stack-port 0/2
