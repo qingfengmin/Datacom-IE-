@@ -33,6 +33,27 @@ route-distinguisher 65004:3
 apply-label per-instance
 vpn-target 3:3 
 
+
+drop-pro hcie
+wred dscp
+dscp af41 low 50 hig 70 dis 10
+
+traff cl pro
+if dscp ef
+if mpls-e 5
+
+traff cl sci
+if dscp af41
+if mpls-e 4
+
+traff be pro
+queue llq ba 102400
+
+traff be sci
+queue af ba 307200
+drop hcie
+
+
 int g 4/0/0.10
 ip binding vpn-instance OA_IN
 ip a 10.20.3.2 30
@@ -50,6 +71,36 @@ ip binding vpn-instance R&D
 ip a 10.20.3.10 30
 dot1q termination vid 30
  arp broadcast enable
+traffic-po hcie ou
+
+int g 0/0/1
+isis enable 1
+isis circuit-type p2p
+isis ppp-negotiation 2-way
+isis authentication-mode md5 cipher Huawei@123
+mpls 
+mp  ld
+mp mt 1382
+
+int g 0/0/2
+isis enable 1
+isis circuit-type p2p
+isis ppp-negotiation 2-way
+isis authentication-mode md5 cipher Huawei@123
+mpls 
+mp  ld
+mp mt 1382
+tr ds
+int g 0/0/3
+isis enable 1
+isis circuit-type p2p
+isis ppp-negotiation 2-way
+isis authentication-mode md5 cipher Huawei@123
+isis cost 4
+mpls 
+mp  ld
+mp mt 1382
+
 
 bgp 65000
 router-id 5.0.0.5
