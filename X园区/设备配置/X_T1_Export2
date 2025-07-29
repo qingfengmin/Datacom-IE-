@@ -57,6 +57,24 @@ nat adress-group 10.255.4.2 10.255.4.100
 acl 2000
 rule permit
 
+q
+vlan 202
+
+int vl 202
+ip ad 10.1.200.5 30
+
+int g 0/0/7
+undo portsw
+ip ad 10.20.1.9 30
+
+int g 0/0/8
+undo portsw
+ip ad 10.20.1.6 30
+
+int g 0/0/1
+p l a 
+p d v 202
+ip ad 10.1.200.5 30
 
 
 
