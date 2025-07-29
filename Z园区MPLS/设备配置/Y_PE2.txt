@@ -1,1 +1,146 @@
 
+bfd
+
+
+bfd 
+mpls-passive
+#设备自动创建mpls bfd会话
+
+mpls 
+mpls bfd enable
+mpls bfd-trigger host
+#根据mpls的32位主机地址生成BFD的会话
+mpls bfd min-rx 15 min-tx 15 
+
+isis  1
+frr
+loop-free-alternate level-2
+#计算备份下一跳 为level2
+
+mpls ldp 
+#使能mpls ldp标签分配协议
+
+int g 4/0/1
+mpls
+mpld ldp
+isis ldp-sync
+mpls mtu 1382
+#模拟器上只能使用这个命令 真机可以直接在ISIS协议试图上使用
+
+isis 1
+is-level level-2
+cost-style wide
+domain-authentication-mode md5 cipher Huawei@123
+#使能加密功能
+bfd all-interfaces enable
+bfd all-interfaces min-tx-interval 10 min-rx-interval 10
+ldp en
+
+int loo 0
+isis enable 1
+
+#在六台设备上修改ISIS的开销可以实现最短路径优先转发
+route-policy rdmed permit node 10
+apply cost-type internal
+
+route-policy oamed permit node 10
+apply cost 100
+
+ip vpn-instance OA
+route-distinguisher 65003:3
+apply-label per-instance
+vpn-target 1:1 export-extcommunity
+vpn-target 2:2 import-extcommunity
+
+ip vpn-instance R&D
+route-distinguisher 65003:4
+apply-label per-instance
+vpn-target 3:3 
+
+drop-pro hcie
+wred dscp
+dscp af41 low 50 hig 70 dis 10
+
+traff cl pro
+if dscp ef
+if mpls-e 5
+
+traff cl sci
+if dscp af41
+if mpls-e 4
+
+traff be pro
+queue llq ba 102400
+
+traff be sci
+queue af ba 307200
+drop hcie
+
+traff po hcie
+cla pro be pro
+cla sci be sci
+
+int g 0/0/10.10
+ip binding vpn-instance OA
+ip a 10.20.2.2 30
+dot1q termination vid 10
+ arp broadcast enable
+
+int g 0/0/10.20
+ip binding vpn-instance R&D
+ip a 10.20.2.6 30
+dot1q termination vid 20
+ arp broadcast enable
+ tr ds
+
+
+
+int g 0/0/1
+isis enable 1
+isis circuit-type p2p
+isis ppp-negotiation 2-way
+isis authentication-mode md5 cipher Huawei@123
+mpls 
+mp  ld
+mp mt 1382
+
+int g 0/0/2
+isis enable 1
+isis circuit-type p2p
+isis ppp-negotiation 2-way
+isis authentication-mode md5 cipher Huawei@123
+mpls 
+mp  ld
+mp mt 1382
+
+int g 0/0/3
+isis enable 1
+isis circuit-type p2p
+isis ppp-negotiation 2-way
+isis authentication-mode md5 cipher Huawei@123
+isis cost 4
+mpls 
+mp  ld
+mp mt 1382
+traffic-po hcie ou
+
+bgp 65000
+router-id 4.0.0.4
+peer 2.0.0.2 as 65000
+peer 2.0.0.2 c l 0 
+peer 2.0.0.2 password cipher Huawei@123
+ipv4-family unicast
+undo peer 2.0.0.2 enable
+ipv4-family vpnv4
+peer 2.0.0.2 enable
+ipv4-family vpn-instance OA
+peer 10.20.2.9 as 65003
+peer 10.20.2.9 password cipher Huawei@123
+peer 10.20.2.9 route-policy oamed export
+peer 10.20.2.9 valid-ttl-hops 1
+ipv4-family vpn-instance R&D
+peer 10.20.2.13 as 65003
+peer 10.20.2.13 password cipher Huawei@123
+peer 10.20.2.13 route-policy rdmed export
+peer 10.20.2.13 valid-ttl-hops 1
+
