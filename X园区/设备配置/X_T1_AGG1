@@ -89,8 +89,33 @@ radius-server authentication 10.1.60.2 1812 weight 80
 radius-server accounting 10.1.60.2 1813 weight 80
 q
 radius-server authorization 10.1.60.2 share-key cipher Huawei@123
-#创建radius
+#创建radius模板
 
+aaa 
+authentication-scheme Employee
+authentication-mode radius
+accounting-scheme Employee
+accounting-mode radius
+authentication-scheme ap-noauth
+authentication-mode none
+domain Employee  #创建用户所在的域
+authentication-scheme Employee
+accounying-scheme Employee
+radius-server Employee
+q
+domain ap-noauth
+authentication-scheme ap-noauth
+q
+q
+authentication-profile name Employee
+dot1x-access-profile Employee
+mac-access-profile Employee
+access-domain Employee force
+authentication dot1x-mac-bypass
+创建认证模板
+
+domain ap-onauth mac-authen force mac-address 74e9-bfbc-0000 mask ffff-ffff-0000
+可以选择网段加入的方式让两台AP设备加入域,这里的MAC地址需要参考考场的APMAC地址
 
 
 ####
@@ -100,11 +125,13 @@ interface eth-trunk 2
 port link-type hybrid
 port hybrid tagged vlan 11 to 15 21 to 25 100
 mo l 
+au Employee
 
 interface eth-trunk 3
 port link-type hybrid 
 port hybrid tagged vlan 11 to 15 21 to 25 100
 mo l 
+au Employee
 
 聚合接口的接口号可以去参考机架姐还原的topo,
 
