@@ -27,10 +27,10 @@ route-po c104 pe no 10
 app ext co 0:104
 if acl 2000
 
-route-po oamed pe no 10
+route-po rdmed pe no 10
 app cost-ty internal
 
-route-po rdmed pe no 10
+route-po oamed pe no 10
 app cost 100
 
 ip vpn- oA
@@ -139,7 +139,6 @@ seg ipv loc hcie ev
 seg ipv t b ev
 pe 10.20.2.13 as 65003
 pe 10.20.2.13 p c Huawei@123
-
 
 
 
