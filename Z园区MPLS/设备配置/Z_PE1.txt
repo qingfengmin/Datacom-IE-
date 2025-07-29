@@ -1,118 +1,77 @@
+bfd frr bind peer-ip 1.0.0.1
+discriminator local 20
+discriminator remote 10
+min-tx-interval 100
+min-rx-interval 100
+com
 
-route-policy rdmed permit node 10
-apply cost-type internal
+bfd frr1 bind peer-ip 3.0.0.3
+discriminator local 30
+discriminator remote 40
+min-tx-interval 100
+min-rx-interval 100
+com
 
 route-policy oamed permit node 10
+apply cost-type internal
+
+route-policy rdmed permit node 10
 apply cost 100
 
 ip vpn-instance OA_IN
-route-distinguisher 65004:4
+route-distinguisher 65004:1
 apply-label per-instance
 vpn-target 1:1 import-extcommunity
 
 ip vpn-instance OA_OUT
-route-distinguisher 65004:5
+route-distinguisher 65004:2
 apply-label per-instance
 vpn-target 2:2 export-extcommunity
 
 ip vpn-instance R&D
-route-distinguisher 65004:6
+route-distinguisher 65004:3
 apply-label per-instance
 vpn-target 3:3 
 
-drop-pro hcie
-wred dscp
-dscp af41 low 50 hig 70 dis 10
-
-traff cl pro
-if dscp ef
-if mpls-e 5
-
-traff cl sci
-if dscp af41
-if mpls-e 4
-
-traff be pro
-queue llq ba 102400
-
-traff be sci
-queue af ba 307200
-drop hcie
-
-traff po hcie
-cla pro be pro
-cla sci be sci
-
-int g 0/0/10.10
+int g 4/0/0.10
 ip binding vpn-instance OA_IN
-ip a 10.20.3.14 30
+ip a 10.20.3.2 30
 dot1q termination vid 10
  arp broadcast enable
 
-int g 0/0/10.20
+int g 4/0/0.20
 ip binding vpn-instance OA_OUT
-ip a 10.20.3.18 30
+ip a 10.20.3.6 30
 dot1q termination vid 20
  arp broadcast enable
 
-int g 0/0/10.30
+int g 4/0/0.30
 ip binding vpn-instance R&D
-ip a 10.20.3.22 30
+ip a 10.20.3.10 30
 dot1q termination vid 30
  arp broadcast enable
- traffic-po hcie ou
- 
- 
-int g 0/0/1
-isis enable 1
-isis circuit-type p2p
-isis ppp-negotiation 2-way
-isis authentication-mode md5 cipher Huawei@123
-mpls 
-mp  ld
-mp mt 1382
-
-int g 0/0/2
-isis enable 1
-isis circuit-type p2p
-isis ppp-negotiation 2-way
-isis authentication-mode md5 cipher Huawei@123
-mpls 
-mp  ld
-mp mt 1382
-tr ds
-int g 0/0/3
-isis enable 1
-isis circuit-type p2p
-isis ppp-negotiation 2-way
-isis authentication-mode md5 cipher Huawei@123
-isis cost 4
-mpls 
-mp  ld
-mp mt 1382
-
 
 bgp 65000
-router-id 6.0.0.6
-peer 2.0.0.2 as 65000
-peer 2.0.0.2 c l 0 
-peer 2.0.0.2 password cipher Huawei@123
+router-id 5.0.0.5
+peer 1.0.0.1 as 65000
+peer 1.0.0.1 c l 0 
+peer 1.0.0.1 password cipher Huawei@123
 ipv4-family unicast
-undo peer 2.0.0.2 enable
+undo peer 1.0.0.1 enable
 ipv4-family vpnv4
-peer 2.0.0.2 enable
+peer 1.0.0.1 enable
 ipv4-family vpn-instance OA_IN
-peer 10.20.3.13 as 65004
-peer 10.20.3.13 password cipher Huawei@123
-peer 10.20.3.13 route-policy oamed export
-peer 10.20.3.13 valid-ttl-hops 1
+peer 10.20.3.1 as 65004
+peer 10.20.3.1 password cipher Huawei@123
+peer 10.20.3.1 route-policy oamed export
+peer 10.20.3.1 valid-ttl-hops 1
 ipv4-family vpn-instance OA_OUT
-peer 10.20.3.17 as 65004
-peer 10.20.3.17 password cipher Huawei@123
-peer 10.20.3.17 allow-as-loop
-peer 10.20.3.17 valid-ttl-hops 1
+peer 10.20.3.5 as 65004
+peer 10.20.3.5 password cipher Huawei@123
+peer 10.20.3.5 allow-as-loop
+peer 10.20.3.5 valid-ttl-hops 1
 ipv4-family vpn-instance R&D
-peer 10.20.3.21 as 65004
-peer 10.20.3.21 password cipher Huawei@123
-peer 10.20.3.21 route-policy rdmed export
-peer 10.20.3.21 valid-ttl-hops 1
+peer 10.20.3.9 as 65004
+peer 10.20.3.9 password cipher Huawei@123
+peer 10.20.3.9 route-policy rdmed export
+peer 10.20.3.9 valid-ttl-hops 1
