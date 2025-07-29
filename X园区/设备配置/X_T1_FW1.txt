@@ -1,1 +1,211 @@
+vlan b 204 to 207
+vs en
+int loo 1
+int loo 2
+interface g 0/0/1
+portswitch 
+port link-type trunk
+port trunk allow-pass vlan 204 205
+undo port trunk allow-pass vlan 1
+interface g 0/0/2
+portswitch 
+port link-type trunk
+port trunk allow-pass vlan 206 207
+undo port trunk allow-pass vlan 1
+
+vsys name Employee 
+ assign interface LoopBack1
+ assign vlan 204
+ assign vlan 206
+
+vsys name Guest 
+ assign interface LoopBack2
+ assign vlan 205
+ assign vlan 207
+
+int vl 204
+ip a 10.1.200.14 30
+int vl 205
+ip a 10.1.200.18 30
+int vl 206
+ip a 10.1.200.22 30
+int vl 207
+ip a 10.1.200.26 30
+int loo 1
+ip a 10.1.0.8 32
+int loo 2
+ip a 10.1.0.9 32
+interface Virtual-if1
+ ip address 10.1.200.254 255.255.255.255
+interface Virtual-if2
+ ip address 10.1.200.253 255.255.255.255
+
+ip route-static vpn-instance Employee 10.1.60.99 255.255.255.255 vpn-instance Guest
+ip route-static vpn-instance Guest 10.1.101.0 255.255.255.0 vpn-instance Employee
+ip route-static vpn-instance Guest 10.1.102.0 255.255.255.0 vpn-instance Employee
+ip route-static vpn-instance Guest 10.1.103.0 255.255.255.0 vpn-instance Employee
+ip route-static vpn-instance Guest 10.1.104.0 255.255.255.0 vpn-instance Employee
+ip route-static vpn-instance Guest 10.1.105.0 255.255.255.0 vpn-instance Employee
+
+ospf 1 router-id 10.1.0.8 vpn-instance Employee
+vpn-instance-capability simple 
+area 1 
+network 10.1.0.8 0.0.0.0
+network 10.1.200.14 0.0.0.0
+network 10.1.200.22 0.0.0.0
+
+ospf 2 router-id 10.1.0.9 vpn-instance Guest
+vpn-instance-capability simple
+area 2
+network 10.1.0.9 0.0.0.0
+network 10.1.200.18 0.0.0.0
+network 10.1.200.26 0.0.0.0
+nssa
+
+虚拟系统Guest
+
+ip address-set guest type object
+ address 0 range 10.1.101.0 10.1.105.255
+q
+ip service-set Guest_Service type object 
+ service 0 protocol tcp destination-port 3389
+q
+firewall zone trust
+ add interface Vlanif207
+ 
+firewall zone untrust
+ add interface Virtual-if2
+ add interface Vlanif205
+
+security-policy
+ rule name ospf
+  source-zone local
+  source-zone trust
+  source-zone untrust
+  destination-zone local
+  destination-zone trust
+  destination-zone untrust
+  service ospf
+  action permit
+ rule name Guest_Service
+  source-zone trust
+  destination-zone untrust
+  source-address address-set guest
+  destination-address 10.1.60.99 mask 255.255.255.255
+  service Guest_Service
+  action permit
+ rule name dney_other
+  source-zone trust
+  destination-zone untrust
+  source-address address-set guest
+  destination-address 10.1.60.0 mask 255.255.255.0
+  service Guest_Service
+  action deny
+ rule name ineternet
+  source-zone trust
+  destination-zone untrust
+  source-address address-set guest
+  action permit
+
+虚拟系统 Employee
+ip address-set guest type object
+ address 0 range 10.1.101.0 10.1.105.255
+q
+ip address-set employee type object
+ address 0 range 10.1.11.0 10.1.15.255
+ address 1 range 10.1.21.0 10.1.25.255
+q
+ip address-set wlan type object
+ address 0 range 10.1.51.0 10.1.55.255
+q
+ip address-set xyz type object
+# 在MPLS场景中可以参考以下地址集
+ address 0 range 10.1.11.0 10.1.15.255
+ address 1 range 10.1.21.0 10.1.25.255
+ address 2 range 10.1.31.0 10.1.35.255
+ address 3 range 10.1.41.0 10.1.45.255
+ address 4 range 10.1.51.0 10.1.55.255
+ address 5 range 10.2.31.0 10.2.35.255
+ address 6 range 10.2.41.0 10.2.45.255
+ address 7 range 10.2.51.0 10.2.55.255
+ address 8 10.100.2.0 mask 24
+ address 9 10.3.101.0 mask 24
+q
+ip address-set xz type object
+# 在SR场景中可以参考下面的地址集
+ address 0 range 10.1.11.0 10.1.15.255
+ address 1 range 10.1.21.0 10.1.25.255
+ address 2 range 10.1.31.0 10.1.35.255
+ address 3 range 10.1.41.0 10.1.45.255
+ address 4 range 10.1.51.0 10.1.55.255
+ address 5 10.3.101.0 mask 24
+q
+ip service-set Guest-Service type object 
+ service 0 protocol tcp destination-port 3389
+
+firewall zone trust
+ add interface Vlanif206
+
+firewall zone untrust
+ add interface Virtual-if1
+ add interface Vlanif204
+
+security-policy
+ rule name ospf
+  source-zone local
+  source-zone trust
+  source-zone untrust
+  destination-zone local
+  destination-zone trust
+  destination-zone untrust
+  service ospf
+  action permit
+ rule name web
+  source-zone trust
+  source-zone untrust
+  destination-address 10.1.60.101 mask 255.255.255.255
+  service http
+  action permit
+ rule name Guest_Service
+  source-zone untrust
+  destination-zone trust
+  source-address address-set guest
+  destination-address 10.1.60.99 mask 255.255.255.255
+  service Guest-Service
+  action permit
+ rule name wlan
+  source-zone trust
+  destination-zone trust
+  source-address address-set wlan
+  destination-address 10.1.60.100 mask 255.255.255.255
+  action permit
+ rule name deny_other
+  source-zone trust
+  destination-zone trust
+  action deny
+
+ rule name xyz
+在MPLS场景中调用
+  source-zone trust
+  destination-zone untrust
+  source-address address-set xyz
+  destination-address address-set xyz
+  action permit
+
+rule name xz
+在SR场景中调用
+  source-zone trust
+  destination-zone untrust
+  source-address address-set xz
+  destination-address address-set xz
+  action permit
+
+ rule name internet
+  source-zone trust
+  destination-zone untrust
+  source-address address-set employee
+  source-address address-set wlan
+  action permit
+
+
 
