@@ -1,1 +1,76 @@
+vlan batch 11 to 15 21 to 25 100 208
+dhcp enable 
+
+interface eth-trunk 1
+port link-type trunk
+port trunk allow-pass vlan 100 208
+
+int loo 0
+ip a 10.1.0.6 32
+int vlanif 208
+ip a 10.1.200.30 30
+
+int vlanif 11
+ip a 10.1.11.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlanif 12
+ip a 10.1.12.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlanif 13
+ip a 10.1.13.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlanif 14
+ip a 10.1.14.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlanif 15
+ip a 10.1.15.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+
+int vlanif 21
+ip a 10.1.21.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlanif 22
+ip a 10.1.22.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlanif 23
+ip a 10.1.23.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlanif 24
+ip a 10.1.24.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+int vlanif 25
+ip a 10.1.25.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.29
+
+ospf 1 router-id 10.1.0.6
+area 1
+network 10.1.0.0 0.0.255.255
+
+#准入认证 直接参考准入认证文档即可
+
+interface eth-trunk 2
+port link-type hybrid
+port hybrid tagged vlan 11 to 15 21 to 25 100
+mo l 
+
+interface eth-trunk 3
+port link-type hybrid 
+port hybrid tagged vlan 11 to 15 21 to 25 100
+mo l 
+
+聚合接口的接口号可以去参考机架姐还原的topo,
+
+
+
+
 
