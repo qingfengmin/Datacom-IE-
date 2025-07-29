@@ -1,1 +1,95 @@
+#T2设备先堆叠
+stack slot 0 renumber 0
+stack slot 0 priority 150
+
+interface stack-port 0/1 #在使能堆叠接口后 直接shutdown相关的接口 
+port interface xg 0/0/1 enable 
+shutdown interface xg 0/0/1
+
+interface stack-port 0/2
+port interface xg 0/0/2 enable
+shutdown interface xg 0/0/2
+
+
+备设备部署
+stack slot 0 renumber 1
+
+interface stack-port 0/1 #在使能堆叠接口后 直接shutdown相关的接口 
+port interface xg 0/0/2 enable 
+shutdown interface xg 0/0/2
+
+interface stack-port 0/2
+port interface xg 0/0/1 enable
+shutdown interface xg 0/0/1
+注意:如果你是先配置主设备的情况下,一定要shutdown接口,如不shutdown,可能会导致在没有敲完备设备情况下,直接导致备设备重启
+备设备部署可以参考X_T1_AGG-2
+
+vlan batch 31 to 35 41 to 45 100 209
+dhcp enable
+interface eth-trunk 1
+port link-type trunk
+port trunk allow-pass vlan 100 209
+
+int loo 0
+ip a 10.1.0.7 32
+int vlanif 209
+ip a 10.1.200.34 30
+
+int vlanif 31
+ip a 10.1.31.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.33
+int vlanif 32
+ip a 10.1.32.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.33
+int vlanif 33
+ip a 10.1.33.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.33
+int vlanif 34
+ip a 10.1.34.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.33
+int vlanif 35
+ip a 10.1.35.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.33
+
+int vlanif 41
+ip a 10.1.41.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.33
+int vlanif 42
+ip a 10.1.42.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.33
+int vlanif 43
+ip a 10.1.43.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.33
+int vlanif 44
+ip a 10.1.44.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.33
+int vlanif 45
+ip a 10.1.45.254 24
+dhcp select relay
+dhcp relay server-ip 10.1.200.33
+
+ospf 1 router-id 10.1.0.7
+area 1
+network 10.1.0.0 0.0.255.255
+
+#准入认证 直接参考准入认证文档即可
+
+interface eth-trunk 2
+port link-type hybrid
+port hybrid tagged vlan 31 to 35 41 to 45 100
+
+interface eth-trunk 3
+port link-type hybrid 
+port hybrid tagged vlan 31 to 35 41 to 45 100
+
+
 
