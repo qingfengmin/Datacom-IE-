@@ -1,4 +1,4 @@
-#T2设备先堆叠
+#T2 主设备
 stack slot 0 renumber 0
 stack slot 0 priority 150
 
@@ -16,11 +16,10 @@ stack slot 0 renumber 1
 
 interface stack-port 0/1 #在使能堆叠接口后 直接shutdown相关的接口 
 port interface xg 0/0/2 enable 
-shutdown interface xg 0/0/2
 
 interface stack-port 0/2
 port interface xg 0/0/1 enable
-shutdown interface xg 0/0/1
+
 注意:如果你是先配置主设备的情况下,一定要shutdown接口,如不shutdown,可能会导致在没有敲完备设备情况下,直接导致备设备重启
 备设备部署可以参考X_T1_AGG-2
 
