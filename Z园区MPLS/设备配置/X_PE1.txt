@@ -1,1 +1,118 @@
 
+bfd
+
+mpls lsr-id 1.0.0.1
+
+bfd 
+mpls-passive
+#设备自动创建mpls bfd会话
+
+mpls 
+mpls bfd enable
+mpls bfd-trigger host
+#根据mpls的32位主机地址生成BFD的会话
+mpls bfd min-rx 15 min-tx 15 
+
+isis  1
+frr
+loop-free-alternate level-2
+#计算备份下一跳 为level2
+
+mpls ldp 
+#使能mpls ldp标签分配协议
+
+int g 4/0/1
+mpls
+mpld ldp
+isis ldp-sync
+mpls mtu 1382
+#模拟器上只能使用这个命令 真机可以直接在ISIS协议试图上使用
+
+isis 1
+is-level level-2
+cost-style wide
+domain-authentication-mode md5 cipher Huawei@123
+#使能加密功能
+bfd all-interfaces enable
+bfd all-interfaces min-tx-interval 10 min-rx-interval 10
+
+int loo 0
+isis enable 1
+
+
+
+int g 0/0/1
+isis enable 1
+isis circuit-type p2p
+isis ppp-negotiation 2-way
+isis authentication-mode md5 cipher Huawei@123
+
+int g 0/0/2
+isis enable 1
+isis circuit-type p2p
+isis ppp-negotiation 2-way
+isis authentication-mode md5 cipher Huawei@123
+
+int g 0/0/3
+isis enable 1
+isis circuit-type p2p
+isis ppp-negotiation 2-way
+isis authentication-mode md5 cipher Huawei@123
+isis cost 4
+#在六台设备上修改ISIS的开销可以实现最短路径优先转发
+
+bfd frr bind peer-ip 5.0.0.5
+discriminator local 10
+discriminator remote 20
+min-tx-interval 100
+min-rx-interval 100
+com
+
+ip ip-prefix frr permit 5.0.0.5 32
+ip ip-prefix ZPE2 permit 6.0.0.6 32
+
+route-policy oamed permit node 5
+if-match ip next-hop ip-prefix ZPE2
+apply cost 2000
+route-policy oamed permit node 10
+apply cost-type internal
+
+route-policy frr permit node 10
+if-match ip next-hop ip-prefix frr
+apply backup-nexthop 6.0.0.6
+
+ip vpn-instance OA
+route-distinguisher 65001:1
+apply-label per-route
+vpn frr route-policy frr
+vpn-target 1:1 export-extcommunity
+vpn-target 2:2 import-extcommunity
+
+int g 4/0/0
+ip binding vpn-instance OA
+ip a 10.20.1.2 30
+
+bgp 65000
+group ibgp internal
+peer ibgp c l 0 
+peer ibgp password cipher Huawei@123
+peer 3.0.0.3 group ibgp
+peer 5.0.0.5 group ibgp
+peer 2.0.0.2 group ibgp
+ipv4-family unicast
+undo peer ibgp enable
+ipv4-family vpnv4
+undo policy vpn-target
+reflector cluster-id 1.0.0.1
+peer 2.0.0.2 enable
+peer ibgp enable
+peer ibgp reflect-client
+peer 3.0.0.3 group ibgp
+peer 5.0.0.5 group ibgp
+ipv4-family vpn-instance OA
+peer 10.20.1.1 as 65001
+peer 10.20.1.1 password cipher Huawei@123
+peer 10.20.1.1 route-policy oamed export
+
+
+
