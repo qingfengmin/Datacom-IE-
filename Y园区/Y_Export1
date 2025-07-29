@@ -1,1 +1,84 @@
+ip ip-p oa pe 10.2.31.0 24
+ip ip-p oa pe 10.2.32.0 24
+ip ip-p oa pe 10.2.33.0 24
+ip ip-p oa pe 10.2.34.0 24
+ip ip-p oa pe 10.2.35.0 24
+ip ip-p oa pe 10.2.41.0 24
+ip ip-p oa pe 10.2.42.0 24
+ip ip-p oa pe 10.2.43.0 24
+ip ip-p oa pe 10.2.44.0 24
+ip ip-p oa pe 10.2.45.0 24
+ip ip-p oa pe 10.2.51.0 24
+ip ip-p oa pe 10.2.52.0 24
+ip ip-p oa pe 10.2.53.0 24
+ip ip-p oa pe 10.2.54.0 24
+ip ip-p oa pe 10.2.55.0 24
+ip ip-p oa pe 10.100.2.0 24
+ip ip-p oa de 0.0.0.0 0 l 32
+
+ip ip-p rd pe 10.2.11.0 24
+ip ip-p rd pe 10.2.12.0 24
+ip ip-p rd pe 10.2.13.0 24
+ip ip-p rd pe 10.2.14.0 24
+ip ip-p rd pe 10.2.15.0 24
+ip ip-p rd pe 10.2.21.0 24
+ip ip-p rd pe 10.2.22.0 24
+ip ip-p rd pe 10.2.23.0 24
+ip ip-p rd pe 10.2.24.0 24
+ip ip-p rd pe 10.2.25.0 24
+ip ip-p rd pe 10.100.3.0 24
+ip ip-p rd de 0.0.0.0 0 l 32
+
+
+acl 2021
+ru pe so 10.2.21.0 0.0.0.255
+ru pe so 10.2.22.0 0.0.0.255
+ru pe so 10.2.23.0 0.0.0.255
+ru pe so 10.2.24.0 0.0.0.255
+ru pe so 10.2.25.0 0.0.0.255
+
+acl 2022
+ru pe so 10.2.11.0 0.0.0.255
+ru pe so 10.2.12.0 0.0.0.255
+ru pe so 10.2.13.0 0.0.0.255
+ru pe so 10.2.14.0 0.0.0.255
+ru pe so 10.2.15.0 0.0.0.255
+
+traf cl sc
+if acl 2021
+
+
+traf cl yf
+if acl 2022
+
+traf be sc
+rem ds ef
+gts cir 102400
+
+traf be yf
+rem ds af41
+gts cir 307200
+
+traf po hcie
+cl sc be sc
+cl yf be yf
+
+
+int g 0/0/7.20
+traffic-p hcie out
+
+
+int g 0/0/6.20
+traffic-po hcie out
+
+ip route-s vpn vpn4 10.100.2.0 24 null 0
+
+bgp 65003
+ipv4 vpn- vpn2
+pe 10.20.2.2 ip-p oa ex
+pe 10.20.2.10 ip-p oa ex
+ipv4 vpn- vpn3
+pe 10.20.2.6 ip-p rd ex
+pe 10.20.2.14 ip-p rd ex
+
 
