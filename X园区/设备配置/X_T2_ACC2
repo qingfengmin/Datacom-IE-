@@ -1,1 +1,16 @@
 
+v b 100
+
+l2protocol-tunnel user-defined-protocol dot1x protocol-mac 0180-c200-0003 group-mac 0100-0000-0002
+将1-20口全部设置 此处的MAC地址需要牢记
+
+
+interface eth-trunk 1
+l2protocol-tunnel user-defined-protocol dot1x enable
+mo l 
+p l t
+p t a v 100
+
+p g g 0/0/1 t g 0/0/20
+l2protocol-tunnel user-defined-protocol dot1x enable
+
