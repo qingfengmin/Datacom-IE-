@@ -1,1 +1,54 @@
+interface g 0/0/3
+p l t
+p t a v 51 to 55 10 to 105 203
+vlan pool Employee
+vlan 51 to 55
+assignment hash #根据哈希算法分配地址已经是默认配置无需再配
+vlan pool Guest
+vlan 101 to 105
+assignment hash
 
+ospf 1 router-id 10.1.0.11
+area 0
+network 10.1.0.11 0.0.0.0
+network 10.1.200.10 0.0.0.0
+network 10.1.100.254 0.0.0.0 #非必要
+
+wlan 
+vap-profile name Guest
+service-vlan vlan-pool Guest
+yes
+quit
+vap-profile name Employee
+service-vlan vlan-pool Employee
+yes
+quit
+
+ap-group name X-T2
+
+ap-id 2 ap-mac 自行查找
+ap-name X_T2_AP
+ap-group X_T2
+
+security-profile name x-guest
+  security wpa-wpa2 psk pass-phrase Huawei@123 aes
+ security-profile name x-employee
+  security wpa-wpa2 psk pass-phrase Huawei@123 aes
+ ssid-profile name x-guest
+  ssid X_Guest_010
+ ssid-profile name x-employee
+  ssid X_Employee_010
+ vap-profile name x-guest
+  forward-mode tunnel
+  service-vlan vlan-pool Guest
+  ssid-profile x-guest
+  security-profile x-guest
+ vap-profile name x-employee
+  forward-mode tunnel
+  service-vlan vlan-pool Employee
+  ssid-profile x-employee
+  security-profile x-employee
+
+ap-group name X_T2
+vap-profile x-guest wlan 1 radio all
+vap-profile x-employee wlan 2 radio all
