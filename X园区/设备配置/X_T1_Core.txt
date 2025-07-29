@@ -1,1 +1,294 @@
-### 声明
+v b 51 t 55 100 t 105 60 201 t 209
+
+ip vpn- Employee
+rou 65001:1
+ip vpn- Guest
+rou 65001:2
+
+dhcp enable
+
+ip ip-p Employee de 10.1.11.0 24 
+ip ip-p Employee de 10.1.12.0 24 
+ip ip-p Employee de 10.1.13.0 24 
+ip ip-p Employee de 10.1.14.0 24 
+ip ip-p Employee de 10.1.15.0 24 
+ip ip-p Employee de 10.1.21.0 24 
+ip ip-p Employee de 10.1.22.0 24 
+ip ip-p Employee de 10.1.23.0 24 
+ip ip-p Employee de 10.1.24.0 24 
+ip ip-p Employee de 10.1.25.0 24 
+ip ip-p Employee de 10.1.31.0 24 
+ip ip-p Employee de 10.1.32.0 24 
+ip ip-p Employee de 10.1.33.0 24 
+ip ip-p Employee de 10.1.34.0 24 
+ip ip-p Employee de 10.1.35.0 24 
+ip ip-p Employee de 10.1.41.0 24 
+ip ip-p Employee de 10.1.42.0 24 
+ip ip-p Employee de 10.1.43.0 24 
+ip ip-p Employee de 10.1.44.0 24 
+ip ip-p Employee de 10.1.45.0 24 
+ip ip-p Employee de 10.1.51.0 24 
+ip ip-p Employee de 10.1.52.0 24 
+ip ip-p Employee de 10.1.53.0 24 
+ip ip-p Employee de 10.1.54.0 24 
+ip ip-p Employee de 10.1.55.0 24 
+ip ip-p Employee de 10.1.60.0 24
+ip ip-p Employee pe 0.0.0.0 0 l 32
+
+ip ip-p Guest de 10.1.101.0 24 
+ip ip-p Guest de 10.1.102.0 24 
+ip ip-p Guest de 10.1.103.0 24 
+ip ip-p Guest de 10.1.104.0 24 
+ip ip-p Guest de 10.1.105.0 24 
+ip ip-p Guest pe 0.0.0.0 0 l 32
+
+acl 3000
+ru pe ip so 10.1.51.0 0.0.0.255 des 10.1.60.0 0.0.0.255
+ru pe ip so 10.1.52.0 0.0.0.255 des 10.1.60.0 0.0.0.255
+ru pe ip so 10.1.53.0 0.0.0.255 des 10.1.60.0 0.0.0.255
+ru pe ip so 10.1.54.0 0.0.0.255 des 10.1.60.0 0.0.0.255
+ru pe ip so 10.1.55.0 0.0.0.255 des 10.1.60.0 0.0.0.255
+
+acl 3001
+ru pe tcp so 10.1.60.101 0 des eq www
+
+acl 3002
+ru pe ip so 10.1.60.100 0 des 10.1.60.0 0.0.0.255
+ru pe ip so 10.1.60.100 0 des 10.1.60.0 0.0.0.255
+ru pe ip so 10.1.60.100 0 des 10.1.60.0 0.0.0.255
+ru pe ip so 10.1.60.100 0 des 10.1.60.0 0.0.0.255
+ru pe ip so 10.1.60.100 0 des 10.1.60.0 0.0.0.255
+
+int g 0/0/1
+p l a
+p d v 201
+
+int g 0/0/2
+p l a 
+p d v 202
+
+int g 0/0/3
+p l t
+p t a v 51 t 55 100 t 105 203
+traffic-re in acl 3000 vpn- Employee ip- 10.1.200.22
+
+int g 0/0/4
+p l t
+p t a v 204 205
+u p t a v 1
+traffic-re in acl 3001 ip- 10.1.200.5
+
+int g 0/0/5
+p l t
+p t a v 206 207
+u p t a v 1
+
+int g 0/0/6
+p l a
+p d v 60
+traffic-re in acl 3002 vpn- Employee ip- 10.1.200.22
+#经过的10.1.60.100 ICMP访问报文的reply 报文进行重定向
+
+int eth 1
+mo l
+p l t
+p t a v 208 100
+
+int eth 2
+mo l
+p l t
+p t a v 209 100
+t g 这里取决于你的端口号
+
+ip pool wireless_employee1
+ vpn Employee
+ip pool wireless_employee2
+ vpn Employee
+ip pool wireless_employee3
+ vpn Employee
+ip pool wireless_employee4
+ vpn Employee
+ip pool wireless_employee5
+ vpn Employee
+ip pool wired_finance1
+ vpn Employee
+ip pool wired_finance2
+ vpn Employee
+ip pool wired_finance3
+ vpn Employee
+ip pool wired_finance4
+ vpn Employee
+ip pool wired_finance5
+ vpn Employee
+ip pool wired_procure1
+ vpn Employee
+ip pool wired_procure2
+ vpn Employee
+ip pool wired_procure3
+ vpn Employee
+ip pool wired_procure4
+ vpn Employee
+ip pool wired_procure5
+ vpn Employee
+ip pool wired_market1
+ vpn Employee
+ip pool wired_market2
+ vpn Employee
+ip pool wired_market3
+ vpn Employee
+ip pool wired_market4
+ vpn Employee
+ip pool wired_market5
+ vpn Employee
+ip pool wired_hr1
+ vpn Employee
+ip pool wired_hr2
+ vpn Employee
+ip pool wired_hr3
+ vpn Employee
+ip pool wired_hr4
+ vpn Employee
+ip pool wired_hr5
+ vpn Employee
+ip pool wirelss_guest1
+ vpn Guest
+ip pool wirelss_guest2
+ vpn Guest
+ip pool wirelss_guest3
+ vpn Guest
+ip pool wirelss_guest4
+ vpn Guest
+ip pool wirelss_guest5
+ vpn Guest
+ 
+int loo 0
+ip ad 10.1.0.3 32
+int loo 1
+i b v Employee
+ip ad 10.1.0.4 32
+int loo 2
+i b v Guest
+ip ad 10.1.0.5 32
+
+
+int vl 201
+ ip ad 10.1.200.2 30
+int vl 202
+ ip ad 10.1.200.6 30
+int vl 203
+ ip ad 10.1.200.9 30
+int vl 204
+ ip ad 10.1.200.13 30
+int vl 205
+ ip ad 10.1.200.17 30
+int vl 206
+i b v Employee
+ ip ad 10.1.200.21 30
+int vl 207
+i b v Guest
+ ip ad 10.1.200.25 30
+int vl 208
+i b v Employee
+ ip ad 10.1.200.29 30
+ dh se g
+int vl 209
+i b v Employee
+ ip ad 10.1.200.33 30
+dh se g
+
+int vl 51
+ i b v Employee
+ ip ad 10.1.51.254 24
+dh se g
+int vl 52
+ i b v Employee
+ ip ad 10.1.52.254 24
+dh se g
+int vl 53
+ i b v Employee
+ ip ad 10.1.53.254 24
+dh se g
+int vl 54
+ i b v Employee
+ ip ad 10.1.54.254 24
+dh se g
+int vl 55
+ i b v Employee
+ ip ad 10.1.55.254 24
+dh se g
+
+ospf 1 rou 10.1.0.3
+a 0
+net 10.1.0.3 0.0.0.0
+net 10.1.200.2 0.0.0.0
+net 10.1.200.6 0.0.0.0
+net 10.1.200.9 0.0.0.0
+q
+a 1
+net 10.1.200.13 0.0.0.0
+fil ip Guest im
+q
+a 2
+net 10.1.200.17 0.0.0.0
+fil ip Employee im
+ns 
+
+
+ospf 2 router 10.1.0.4 vpn- Employee
+v s
+si vl 51
+si vl 52
+si vl 53
+si vl 54
+si vl 55
+a 1
+net 10.1.51.254 0.0.0.0
+net 10.1.52.254 0.0.0.0
+net 10.1.53.254 0.0.0.0
+net 10.1.54.254 0.0.0.0
+net 10.1.55.254 0.0.0.0
+net 10.1.200.21 0.0.0.0
+net 10.1.200.29 0.0.0.0
+net 10.1.200.33 0.0.0.0
+net 10.1.0.5 0.0.0.0
+
+int vl 101
+ i b v Guest
+ ip ad 10.1.101.254 24
+dh se g
+int vl 102
+ i b v Guest
+ ip ad 10.1.102.254 24
+dh se g
+int vl 103
+ i b v Guest
+ ip ad 10.1.103.254 24
+dh se g
+int vl 104
+ i b v Guest
+ ip ad 10.1.104.254 24
+dh se g
+int vl 105
+ i b v Guest
+ ip ad 10.1.105.254 24
+dh se g
+
+
+ospf 3 router 10.1.0.5 vpn- Guest
+v s
+si vl 101
+si vl 102
+si vl 103
+si vl 104
+si vl 105
+a 2
+net 10.1.101.254 0.0.0.0
+net 10.1.102.254 0.0.0.0
+net 10.1.103.254 0.0.0.0
+net 10.1.104.254 0.0.0.0
+net 10.1.105.254 0.0.0.0
+net 10.1.200.25 0.0.0.0
+net 10.1.0.5 0.0.0.0
+ns
+
+
