@@ -1,1 +1,77 @@
+ip vpn-instance OA
+route-distinguisher 65004:50
 
+ip vpn-instance R&D
+route-distinguisher 65004:60
+
+int g 0/0/7.10
+ip binding vpn-instance OA
+ip a 10.20.3.1 30
+dot1q termination vid 10
+ arp broadcast enable
+
+int g 0/0/7.20
+ip binding vpn-instance OA
+ip a 10.20.3.5 30
+dot1q termination vid 20
+ arp broadcast enable
+
+int g 0/0/7.30
+ip binding vpn-instance R&D
+ip a 10.20.3.9 30
+dot1q termination vid 30
+ arp broadcast enable
+ 
+int g 0/0/6.10
+ip binding vpn-instance OA
+ip a 10.20.3.13 30
+dot1q termination vid 10
+ arp broadcast enable
+
+int g 0/0/6.20
+ip binding vpn-instance OA
+ip a 10.20.3.17 30
+dot1q termination vid 20
+ arp broadcast enable
+
+int g 0/0/6.30
+ip binding vpn-instance R&D
+ip a 10.20.3.21 30
+dot1q termination vid 30
+ arp broadcast enable
+
+int loo 0
+ip binding vpn-instance OA
+ip address 10.3.101.254 24
+int loo 1
+ip binding vpn-instance R&D
+ip address 10.3.99.254 24
+int loo 2
+ip binding vpn-instance R&D
+ip address 10.3.100.254 24
+
+bgp 65004
+router-id 10.20.3.2
+ipv4-family vpn-instance OA
+peer 10.20.3.2 as 65000
+peer 10.20.3.2 password cipher Huawei@123
+peer 10.20.3.2 valid-ttl-hops 1
+peer 10.20.3.6 as 65000
+peer 10.20.3.6 password cipher Huawei@123
+peer 10.20.3.6 valid-ttl-hops 1
+peer 10.20.3.14 as 65000
+peer 10.20.3.14 password cipher Huawei@123
+peer 10.20.3.14 valid-ttl-hops 1
+peer 10.20.3.18 as 65000
+peer 10.20.3.18 password cipher Huawei@123
+peer 10.20.3.18 valid-ttl-hops 1
+network 10.3.101.254 24
+ipv4-family vpn-instance R&D
+peer 10.20.3.10 as 65000
+peer 10.20.3.10 password cipher Huawei@123
+peer 10.20.3.10 valid-ttl-hops 1
+peer 10.20.3.22 as 65000
+peer 10.20.3.22 password cipher Huawei@123
+peer 10.20.3.22 valid-ttl-hops 1
+network 10.3.99.254 24
+network 10.3.100.254 24
