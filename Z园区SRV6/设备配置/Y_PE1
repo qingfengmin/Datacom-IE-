@@ -1,1 +1,144 @@
+isis
+is-l level-2
+do md ci Huawei@123
+avo te
+avo frr
+ipv avo seg 
+ipv bfd a en
+ipv bfd a min-t 15 min-r 15
+ipv frr
+loo level-2
+ti level-2
+
+int loo 0
+is ip en
+
+sbfd
+des ipv fc00::5 re 5.0.0.5
+
+tunnel-po hcie
+t s i srv6-te-po lo 1
+
+acl 2000
+ru pe so 10.3.101.0 0.0.0.255
+
+route-po c103 pe no 10
+app ext co 0:103
+if acl 2000
+
+route-po oamed pe no 10
+app cost-ty internal
+
+route-po rdmed pe no 10
+app cost 100
+
+ip vpn- oA
+rou 65003:1
+vpn frr
+vpn- 1:1 ev
+tnl-po hcie ev
+
+ip vpn- R&D
+rou 65003:2
+vpn frr
+vpn- 3:3 ev
+tnl-po hcie ev
+
+flow-wred hcie
+co g low 70 h 80 dis 30
+co y low 40 h 60 dis 30
+co r low 20 h 30 dis 50
+
+flow-queue hcie
+queue ef sha 102400
+queue af4 sha 307200 flow-wred hcie
+
+qos-pro hcie
+user cir 409600 flow hcie
+
+int g0/5/3.10
+vlan-ty do 10
+i b v OA
+ip ad 10.20.2.2 30
+
+int g0/5/3.20
+vlan-ty do 20
+i b v R&D
+ip ad 10.20.2.6 30
+tr ip
+
+seg ipv 
+loc hcie
+op :: 1 end no
+op ::10 end-x int g 0/5/2 ne fe80::4 no
+op ::20 end-x int g 0/5/0 ne fe80::1 no
+op ::30 end-x int g 0/5/1 ne fe80::5 no
+op ::100 end-op
+srv6-te-po loc hcie
+srv6-te-po ba h en
+srv6-te-po bfd s en
+srv6-te-po bfd min-t 40
+srv6-te-po bfd min-t 55 backup
+seg y1-z1
+in 10 s i fc02:3::30
+in 20 s i fc02:5::1
+seg y1-z1-b
+in 10 s i fc02:3::10
+in 20 s i fc02:4::30
+in 30 s i fc02:6::10
+in 40 s i fc02:5::1
+srv6-te po hcie end fc00::3 co 103
+can p 200
+seg y1-z1
+can p 100
+seg y1-z1-b
+
+int g0/5/0
+is ip en
+is cir p2p
+is ppp 2
+is a m c Huawei@123
+int g0/5/1
+is ip en
+is cir p2p
+is ppp 2
+is a m c Huawei@123
+qos-p hcie ou
+int g0/5/2
+is ip en
+is cir p2p
+is ppp 2
+is a m c Huawei@123
+is ip co 4
+
+bgp 65000
+pe fc00::5 as 65000
+pe fc00::5 c l 0 
+pe fc00::5 p c Huawei@123
+pe fc00::6 as 65000
+pe fc00::6 c l 0 
+pe fc00::6 p c Huawei@123
+l2vpn-fam ev
+pe fc00::5 en
+y
+pe fc00::5 ad en sr
+pe fc00::6 en 
+y 
+pe fc00::6 ad en sr
+pe fc00::5 route-po c103 im
+ipv4-fam vpn- OA
+ad l2 ev
+seg ipv loc hcie ev
+seg ipv t b ev
+pe 10.20.2.1 as 65003
+pe 10.20.2.1 p c Huawei@123
+ipv4-fam vpn- R&D
+ad l2 ev
+seg ipv loc hcie ev
+seg ipv t b ev
+pe 10.20.2.5 as 65003
+pe 10.20.2.5 p c Huawei@123
+
+
+
 
