@@ -1,1 +1,74 @@
+ip ip-prefix oa permit 10.1.11.0 24
+ip ip-prefix oa permit 10.1.12.0 24
+ip ip-prefix oa permit 10.1.13.0 24
+ip ip-prefix oa permit 10.1.14.0 24
+ip ip-prefix oa permit 10.1.15.0 24
+ip ip-prefix oa permit 10.1.21.0 24
+ip ip-prefix oa permit 10.1.22.0 24
+ip ip-prefix oa permit 10.1.23.0 24
+ip ip-prefix oa permit 10.1.24.0 24
+ip ip-prefix oa permit 10.1.25.0 24
+ip ip-prefix oa permit 10.1.31.0 24
+ip ip-prefix oa permit 10.1.32.0 24
+ip ip-prefix oa permit 10.1.33.0 24
+ip ip-prefix oa permit 10.1.34.0 24
+ip ip-prefix oa permit 10.1.35.0 24
+ip ip-prefix oa permit 10.1.41.0 24
+ip ip-prefix oa permit 10.1.42.0 24
+ip ip-prefix oa permit 10.1.43.0 24
+ip ip-prefix oa permit 10.1.44.0 24
+ip ip-prefix oa permit 10.1.45.0 24
+ip ip-prefix oa permit 10.1.51.0 24
+ip ip-prefix oa permit 10.1.52.0 24
+ip ip-prefix oa permit 10.1.53.0 24
+ip ip-prefix oa permit 10.1.54.0 24
+ip ip-prefix oa permit 10.1.55.0 24
+ip ip-prefix oa permit 10.1.0.1 32
+ip ip-prefix oa permit 10.1.0.2 32
+ip ip-prefix oa deny 0.0.0.0  0 less 32
+
+route-policy bto permit node 10
+apply tag 10
+
+route-policy otb deny node 10
+if-match tag 20
+route-policy otb permit node 20
+if-match ip-iprefix oa
+
+ospf 1 router-id 10.1.0.1
+default cost inherit-metric
+import-route bgp type 1 route-policy bto
+default-route-advertise
+area 0
+network 10.1.0.1 0.0.0.0
+network 10.1.200.1 0.0.0.0
+network 10.20.1.5 0.0.0.0
+
+bgp 65001
+import ospf 1 route-policy otb 
+peer 10.20.1.2 as 65000
+peer 10.20.1.2 password ciper Huawei@123
+p 149 255 255
+q
+vlan 201
+
+int vl 201
+ip ad 10.1.200.1 30
+
+int g 0/0/7
+undo portsw
+ip ad 10.20.1.1 30
+
+int g 0/0/8
+undo portsw
+ip ad 10.20.1.5 30
+
+int g 0/0/1
+p l a 
+p d v 201
+ip ad 10.1.200.1 30
+
+注意接口号是参考机架姐的机架一比一还原考场环境,有需要可以自行购买
+
+
 
