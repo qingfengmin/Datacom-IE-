@@ -53,10 +53,31 @@ dhcp select relay
 dhcp relay server-ip 10.1.200.29
 
 ospf 1 router-id 10.1.0.6
+si vl 11
+si vl 12
+si vl 13
+si vl 14
+si vl 15
+si vl 21
+si vl 22
+si vl 23
+si vl 24
+si vl 25
 area 1
-network 10.1.0.0 0.0.255.255
+net 10.1.11.254 0.0.0.0
+net 10.1.12.254 0.0.0.0
+net 10.1.13.254 0.0.0.0
+net 10.1.14.254 0.0.0.0
+net 10.1.15.254 0.0.0.0
+net 10.1.21.254 0.0.0.0
+net 10.1.22.254 0.0.0.0
+net 10.1.23.254 0.0.0.0
+net 10.1.24.254 0.0.0.0
+net 10.1.25.254 0.0.0.0
+net 10.1.0.6 0.0.0.0
+net 10.1.200.30 0.0.0.0
 
-#准入认证 直接参考准入认证文档即可
+
 
 interface eth-trunk 2
 port link-type hybrid
