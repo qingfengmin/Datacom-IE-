@@ -1,1 +1,22 @@
+备设备部署
+stack slot 0 renumber 1
 
+interface stack-port 0/1 #在使能堆叠接口后 直接shutdown相关的接口 
+port interface xg 0/0/2 enable 
+
+interface stack-port 0/2
+port interface xg 0/0/1 enable
+#在方案中先为备用设备刷入堆叠配置
+
+主设备配置
+stack slot 0 renumber 0
+stack slot 0 priority 150
+
+interface stack-port 0/1 #在使能堆叠接口后 直接shutdown相关的接口 
+port interface xg 0/0/1 enable 
+
+interface stack-port 0/2
+port interface xg 0/0/2 enable
+
+
+注意:如果你是先配置备设备的情况下,可以不对接口进行shutdown,先配置堆叠ID的优先级,也可以保证备设备重启
